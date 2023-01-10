@@ -15,6 +15,7 @@ import DeleteUser from './src/pages/DeleteUser';
 const Stack = createStackNavigator();
 
 const App = () => {
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="HomeScreen">

@@ -10,6 +10,8 @@ const db = DatabaseConnection.getConnection();
 const ViewUser = () => {
   let [inputUserId, setInputUserId] = useState('');
   let [userData, setUserData] = useState({});
+  
+  const [user, setUser] = useState();
 
   let searchUser = () => {
     console.log(inputUserId);

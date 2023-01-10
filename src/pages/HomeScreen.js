@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
-import { View, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, SafeAreaView, Alert } from 'react-native';
 import MyImageButton from './components/MyImageButton';
 import { DatabaseConnection } from '../database/database-connection';
 
 const db = DatabaseConnection.getConnection();
 
 const HomeScreen = ({ navigation }) => {
+
   useEffect(() => {
     db.transaction(function (txn) {
       txn.executeSql(
@@ -16,14 +17,36 @@ const HomeScreen = ({ navigation }) => {
           if (res.rows.length == 0) {
             txn.executeSql('DROP TABLE IF EXISTS table_user', []);
             txn.executeSql(
-              'CREATE TABLE IF NOT EXISTS table_user(user_id INTEGER PRIMARY KEY AUTOINCREMENT, user_name VARCHAR(20), user_contact INT(10), user_address VARCHAR(255))',
+              'CREATE TABLE IF NOT EXISTS table_user(user_id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(20), contact INT(10), address VARCHAR(255))',
               []
-            );
+              );
+            }
           }
-        }
-      );
-    });
+          );
+        });
+      }, []);
+      
+  const [dados, setDados] = useState([]);
+
+  useEffect(() => {
+    fetch('https://siad.com.br/apimobile/api.php?funcao=get_pessoas')
+      .then(res => res.json())
+      .then(json => {setDados(json.dados)})
+      .catch(() => alert('Error'))
+    
+      dados.map((dados) => {
+        db.transaction(function (tx) {
+          tx.executeSql(
+            'INSERT INTO table_user (name, contact, address) VALUES (?,?,?)',
+            [dados.nome, dados.telefone, dados.endereco],
+            (tx, results) => {
+              console.log('Results', results.rowsAffected);
+            }
+          );
+        });
+      });
   }, []);
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
